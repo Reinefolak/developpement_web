@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tableau de Bord Administrateur — Intégrateur de Solution</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#070B14',
+              card: '#0D1424',
+              blue: '#00D2FF',
+              purple: '#8B5CF6',
+              orange: '#FF7A00',
+              emerald: '#10B981'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      background-color: #070B14;
+      background-image: 
+        radial-gradient(circle at 10% 0%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 90% 0%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+    }
+  </style>
+</head>
+<body class="text-slate-100 font-sans min-h-screen flex flex-col antialiased">
+
+  <!-- TOP NAVBAR -->
+  <header class="bg-[#0B101E] border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-blue to-brand-purple p-0.5 shadow">
+          <div class="w-full h-full bg-[#0B0F19] rounded-[10px] flex items-center justify-center">
+            <i data-lucide="shield" class="w-5 h-5 text-brand-blue"></i>
+          </div>
+        </a>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black text-sm sm:text-base text-white tracking-wider">ESPACE ADMINISTRATION</h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-blue/15 text-brand-blue border border-brand-blue/30 uppercase">En direct</span>
+          </div>
+          <span class="text-[11px] text-slate-400">Formation Développement Web Mobile + IA</span>
+        </div>
+      </div>
+
+      <!-- User Info & Action buttons -->
+      <div class="flex items-center gap-3">
+        <a href="/" target="_blank" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs transition-colors">
+          <i data-lucide="external-link" class="w-3.5 h-3.5 text-brand-blue"></i>
+          <span>Voir le site public</span>
+        </a>
+
+        <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 text-xs">
+          <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="adminUsername" class="font-semibold text-slate-300">admin</span>
+        </div>
+
+        <button onclick="handleLogout()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 border border-red-500/30 rounded-lg text-xs font-semibold transition-all">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>Déconnexion</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN DASHBOARD CONTENT -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      
+      <!-- Card 1: Total Inscrits -->
+      <div class="bg-[#0E1628] border border-slate-800 rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-400 uppercase">Total Inscrits</span>
+          <div class="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400">
+            <i data-lucide="users" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <span id="statTotal" class="text-2xl sm:text-3xl font-black text-white">0</span>
+          <span class="text-xs text-slate-400 ml-1">candidats</span>
+        </div>
+        <div class="mt-2 text-[11px] text-slate-400">Dossiers enregistrés sur la plateforme</div>
+      </div>
+
+      <!-- Card 2: Validés -->
+      <div class="bg-[#0E1628] border border-emerald-500/30 rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-emerald-400 uppercase">Validés (Encaissés)</span>
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span id="statValidated" class="text-2xl sm:text-3xl font-black text-emerald-400">0</span>
+          <span id="statRevenue" class="text-xs font-bold text-slate-300">0 F CFA</span>
+        </div>
+        <div class="mt-2 text-[11px] text-emerald-300/80">Frais d'inscription de 5 000 FCFA confirmés</div>
+      </div>
+
+      <!-- Card 3: En attente -->
+      <div class="bg-[#0E1628] border border-amber-500/30 rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-amber-400 uppercase">En Attente de Vérif</span>
+          <div class="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <i data-lucide="clock" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span id="statPending" class="text-2xl sm:text-3xl font-black text-amber-400">0</span>
+          <span id="statPendingAmount" class="text-xs font-bold text-slate-400">0 F CFA</span>
+        </div>
+        <div class="mt-2 text-[11px] text-amber-300/80">Captures à vérifier par l'administration</div>
+      </div>
+
+      <!-- Card 4: Refusés -->
+      <div class="bg-[#0E1628] border border-red-500/30 rounded-2xl p-5 relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-red-400 uppercase">Refusés</span>
+          <div class="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400">
+            <i data-lucide="x-circle" class="w-4 h-4"></i>
+          </div>
+        </div>
+        <div class="mt-3">
+          <span id="statRejected" class="text-2xl sm:text-3xl font-black text-red-400">0</span>
+          <span class="text-xs text-slate-400 ml-1">candidats</span>
+        </div>
+        <div class="mt-2 text-[11px] text-red-300/80">Paiement non conforme ou doublon</div>
+      </div>
+
+    </div>
+
+    <!-- CONTROL TOOLBAR: SEARCH, FILTERS & EXPORTS -->
+    <div class="bg-[#0E1628] border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1 max-w-md">
+        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+          <i data-lucide="search" class="w-4 h-4"></i>
+        </div>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Rechercher par nom, téléphone, ville ou N°..."
+          oninput="handleSearchInput()"
+          class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-xs sm:text-sm focus:outline-none focus:border-brand-blue transition-colors"
+        >
+      </div>
+
+      <!-- Filter by status -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="setFilter('all')" id="filterBtnAll" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-blue text-black shadow transition-all">
+          Tous (<span id="countAll">0</span>)
+        </button>
+        <button onclick="setFilter('En attente')" id="filterBtnPending" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-amber-400 border border-slate-800 hover:border-amber-400 transition-all">
+          En attente (<span id="countPending">0</span>)
+        </button>
+        <button onclick="setFilter('Validé')" id="filterBtnValidated" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-emerald-400 border border-slate-800 hover:border-emerald-400 transition-all">
+          Validés (<span id="countValidated">0</span>)
+        </button>
+        <button onclick="setFilter('Refusé')" id="filterBtnRejected" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-red-400 border border-slate-800 hover:border-red-400 transition-all">
+          Refusés (<span id="countRejected">0</span>)
+        </button>
+      </div>
+
+      <!-- Export Actions (EXCEL & PDF) -->
+      <div class="flex items-center gap-2">
+        <!-- Excel Export -->
+        <button onclick="exportToExcel()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition-all">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+          <span>Export Excel (.xlsx)</span>
+        </button>
+
+        <!-- PDF Export -->
+        <button onclick="exportToPdf()" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold shadow-md transition-all">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Export PDF</span>
+        </button>
+
+        <!-- Refresh -->
+        <button onclick="fetchRegistrations()" title="Actualiser" class="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors">
+          <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- REGISTRATIONS TABLE -->
+    <div class="bg-[#0E1628] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-900/90 border-b border-slate-800 text-slate-400 uppercase font-semibold text-[11px] tracking-wider">
+              <th class="py-3.5 px-4">N° Dossier</th>
+              <th class="py-3.5 px-4">Date</th>
+              <th class="py-3.5 px-4">Candidat</th>
+              <th class="py-3.5 px-4">Téléphone / WhatsApp</th>
+              <th class="py-3.5 px-4">Ville</th>
+              <th class="py-3.5 px-4 text-center">Capture Paiement</th>
+              <th class="py-3.5 px-4 text-center">Statut</th>
+              <th class="py-3.5 px-4 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="registrationsTableBody" class="divide-y divide-slate-800/60 text-slate-200">
+            <!-- Populated via JavaScript -->
+            <tr>
+              <td colspan="8" class="text-center py-12 text-slate-500">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <div class="w-6 h-6 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
+                  <span>Chargement des inscriptions...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL: EXAMINER / ZOOM PREUVE DE PAIEMENT & CHANGER STATUT -->
+  <div id="detailModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/85 backdrop-blur-md overflow-y-auto">
+    <div class="relative w-full max-w-3xl bg-[#0D1424] border border-brand-blue/40 rounded-3xl p-6 sm:p-8 shadow-2xl my-8">
+      
+      <!-- Close button -->
+      <button onclick="closeDetailModal()" class="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+        <div class="w-10 h-10 rounded-xl bg-brand-blue/10 border border-brand-blue/30 text-brand-blue flex items-center justify-center">
+          <i data-lucide="file-check" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span>Détails & Preuve de Paiement</span>
+            <span id="modalRegNumber" class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-brand-blue"></span>
+          </h3>
+          <p class="text-xs text-slate-400">Vérification de la capture d'écran de transaction Mobile Money</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left: Image Viewer & Download -->
+        <div class="md:col-span-7 space-y-3">
+          <div class="relative rounded-2xl overflow-hidden border border-slate-700 bg-black flex items-center justify-center min-h-[300px] max-h-[460px]">
+            <img id="modalProofImg" src="" alt="Capture de paiement" class="max-w-full max-h-[440px] object-contain transition-transform">
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <a id="modalDownloadProofBtn" href="#" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-brand-blue rounded-xl text-xs font-bold border border-brand-blue/30 transition-all">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              <span>Télécharger la preuve</span>
+            </a>
+            <button onclick="window.open(document.getElementById('modalProofImg').src, '_blank')" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all">
+              <i data-lucide="maximize" class="w-3.5 h-3.5"></i>
+              <span>Ouvrir en grand</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Candidate Info & Status Controls -->
+        <div class="md:col-span-5 space-y-4">
+          
+          <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-2.5 text-xs">
+            <div class="flex justify-between">
+              <span class="text-slate-400">Nom & Prénom :</span>
+              <span id="modalFullName" class="font-bold text-white"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Sexe :</span>
+              <span id="modalGender" class="font-semibold text-slate-200"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Téléphone / WhatsApp :</span>
+              <span id="modalPhone" class="font-bold text-brand-blue"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Ville :</span>
+              <span id="modalCity" class="font-semibold text-white"></span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Montant reçu :</span>
+              <span class="font-black text-emerald-400">5 000 F CFA</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-400">Date d'envoi :</span>
+              <span id="modalCreatedAt" class="text-slate-400"></span>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+              <span class="text-slate-400">Statut actuel :</span>
+              <span id="modalCurrentStatus" class="px-2 py-0.5 rounded-full font-bold text-[10px]"></span>
+            </div>
+          </div>
+
+          <!-- Quick WhatsApp Communication Button -->
+          <a id="modalWhatsAppBtn" href="#" target="_blank" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all">
+            <i data-lucide="message-circle" class="w-4 h-4"></i>
+            <span>Contacter sur WhatsApp</span>
+          </a>
+
+          <!-- Printable Receipt Link -->
+          <a id="modalReceiptLink" href="#" target="_blank" class="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs rounded-xl border border-slate-700 transition-all">
+            <i data-lucide="file-text" class="w-4 h-4 text-brand-blue"></i>
+            <span>Voir / Imprimer le reçu officiel</span>
+          </a>
+
+          <!-- Status Modification Box -->
+          <div class="bg-slate-900/90 rounded-2xl p-4 border border-slate-800 space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase">
+              Modifier le Statut :
+            </label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="updateModalStatus('Validé')" class="py-2.5 px-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>Valider</span>
+              </button>
+              <button onclick="updateModalStatus('En attente')" class="py-2.5 px-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                <span>En attente</span>
+              </button>
+              <button onclick="updateModalStatus('Refusé')" class="py-2.5 px-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1 transition-all">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                <span>Refuser</span>
+              </button>
+            </div>
+
+            <!-- Notes field -->
+            <div class="pt-2">
+              <label for="modalAdminNotes" class="block text-[11px] text-slate-400 mb-1">Notes internes administration :</label>
+              <textarea id="modalAdminNotes" rows="2" placeholder="Ajouter une remarque..." class="w-full p-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-brand-blue"></textarea>
+            </div>
+          </div>
+
+          <!-- Delete candidate button -->
+          <button onclick="deleteCurrentModalCandidate()" class="w-full text-center text-xs text-red-400 hover:text-red-300 py-1 transition-colors">
+            Supprimer définitivement cette inscription
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // State
+    let allRegistrations = [];
+    let currentFilter = 'all';
+    let currentSearchTerm = '';
+    let currentSelectedCandidate = null;
+
+    // Check auth on load
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/admin/me');
+        if (!res.ok) {
+          window.location.href = '/login';
+          return;
+        }
+        const data = await res.json();
+        document.getElementById('adminUsername').innerText = data.user.username;
+        fetchRegistrations();
+        fetchStats();
+      } catch (e) {
+        window.location.href = '/login';
+      }
+    }
+
+    async function handleLogout() {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      localStorage.removeItem('admin_token');
+      window.location.href = '/login';
+    }
+
+    // Fetch stats
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/admin/stats');
+        const json = await res.json();
+        if (json.success) {
+          const s = json.data;
+          document.getElementById('statTotal').innerText = s.total;
+          document.getElementById('statValidated').innerText = s.validated;
+          document.getElementById('statPending').innerText = s.pending;
+          document.getElementById('statRejected').innerText = s.rejected;
+          
+          document.getElementById('statRevenue').innerText = s.totalCollected.toLocaleString('fr-FR') + ' F CFA';
+          document.getElementById('statPendingAmount').innerText = (s.pending * 5000).toLocaleString('fr-FR') + ' F CFA';
+
+          document.getElementById('countAll').innerText = s.total;
+          document.getElementById('countPending').innerText = s.pending;
+          document.getElementById('countValidated').innerText = s.validated;
+          document.getElementById('countRejected').innerText = s.rejected;
+        }
+      } catch (e) {
+        console.error('Stats error:', e);
+      }
+    }
+
+    // Fetch registrations list
+    async function fetchRegistrations() {
+      try {
+        let url = `/api/admin/registrations?status=${currentFilter}`;
+        if (currentSearchTerm) {
+          url += `&search=${encodeURIComponent(currentSearchTerm)}`;
+        }
+
+        const res = await fetch(url);
+        if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+          }
+          throw new Error('Erreur lors du chargement des inscriptions');
+        }
+
+        const json = await res.json();
+        allRegistrations = json.data || [];
+        renderTable(allRegistrations);
+        fetchStats();
+      } catch (err) {
+        document.getElementById('registrationsTableBody').innerHTML = `
+          <tr><td colspan="8" class="text-center py-8 text-red-400">Erreur : ${err.message}</td></tr>
+        `;
+      }
+    }
+
+    // Render Table
+    function renderTable(list) {
+      const tbody = document.getElementById('registrationsTableBody');
+      
+      if (!list || list.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-12 text-slate-500">
+              <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+              <span>Aucune inscription trouvée.</span>
+            </td>
+          </tr>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      tbody.innerHTML = list.map(item => {
+        // Status Badge Style
+        let statusBadge = '';
+        if (item.status === 'Validé') {
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">● Validé</span>';
+        } else if (item.status === 'Refusé') {
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500/15 text-red-400 border border-red-500/30">● Refusé</span>';
+        } else {
+          statusBadge = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">● En attente</span>';
+        }
+
+        // WhatsApp direct link
+        const cleanPhone = item.phone.replace(/[^0-9]/g, '');
+        const waMsg = encodeURIComponent(`Bonjour ${item.full_name}, l'administration de Intégrateur de Solution vous contacte au sujet de votre inscription à la formation Développement Web Mobile + IA (N° ${item.registration_number}).`);
+        const waLink = `https://wa.me/${cleanPhone.startsWith('229') ? cleanPhone : '229' + cleanPhone}?text=${waMsg}`;
+
+        const dateFormatted = new Date(item.created_at).toLocaleDateString('fr-FR', {
+          day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+
+        return `
+          <tr class="hover:bg-slate-800/40 transition-colors">
+            
+            <!-- N° Dossier -->
+            <td class="py-3 px-4 font-mono font-bold text-brand-blue whitespace-nowrap">
+              ${item.registration_number}
+            </td>
+
+            <!-- Date -->
+            <td class="py-3 px-4 text-slate-400 whitespace-nowrap text-[11px]">
+              ${dateFormatted}
+            </td>
+
+            <!-- Candidat -->
+            <td class="py-3 px-4 whitespace-nowrap">
+              <div class="font-bold text-white">${item.full_name}</div>
+              <div class="text-[10px] text-slate-400">${item.gender}</div>
+            </td>
+
+            <!-- Phone / WhatsApp -->
+            <td class="py-3 px-4 whitespace-nowrap">
+              <a href="${waLink}" target="_blank" class="inline-flex items-center gap-1 text-slate-300 hover:text-emerald-400 font-medium">
+                <i data-lucide="message-circle" class="w-3.5 h-3.5 text-emerald-400"></i>
+                <span>${item.phone}</span>
+              </a>
+            </td>
+
+            <!-- Ville -->
+            <td class="py-3 px-4 text-slate-300 whitespace-nowrap">
+              ${item.city}
+            </td>
+
+            <!-- Capture Thumbnail -->
+            <td class="py-3 px-4 text-center">
+              <button onclick="openDetailModal(${item.id})" class="inline-block relative group" title="Cliquer pour examiner la preuve">
+                <img src="/uploads/${item.proof_image}" alt="Preuve" class="w-10 h-10 object-cover rounded-lg border border-slate-700 group-hover:border-brand-blue group-hover:scale-105 transition-all mx-auto bg-black">
+                <div class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <i data-lucide="eye" class="w-4 h-4 text-white"></i>
+                </div>
+              </button>
+            </td>
+
+            <!-- Statut -->
+            <td class="py-3 px-4 text-center whitespace-nowrap">
+              ${statusBadge}
+            </td>
+
+            <!-- Actions -->
+            <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+              <!-- Quick Validate -->
+              <button onclick="quickUpdateStatus(${item.id}, 'Validé')" title="Valider l'inscription" class="p-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white rounded-lg transition-colors">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+              </button>
+              
+              <!-- Quick Reject -->
+              <button onclick="quickUpdateStatus(${item.id}, 'Refusé')" title="Refuser l'inscription" class="p-1.5 bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white rounded-lg transition-colors">
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
+              </button>
+
+              <!-- View Details -->
+              <button onclick="openDetailModal(${item.id})" title="Examiner en détail" class="p-1.5 bg-brand-blue/10 hover:bg-brand-blue text-brand-blue hover:text-black rounded-lg transition-colors">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              </button>
+
+              <!-- Download receipt -->
+              <a href="/api/registration/${item.registration_number}/receipt" target="_blank" title="Imprimer le reçu PDF" class="inline-block p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors">
+                <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+              </a>
+            </td>
+
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // Filter switching
+    function setFilter(status) {
+      currentFilter = status;
+      
+      const buttons = {
+        all: document.getElementById('filterBtnAll'),
+        'En attente': document.getElementById('filterBtnPending'),
+        'Validé': document.getElementById('filterBtnValidated'),
+        'Refusé': document.getElementById('filterBtnRejected')
+      };
+
+      Object.entries(buttons).forEach(([key, btn]) => {
+        if (key === status) {
+          btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-blue text-black shadow transition-all';
+        } else {
+          btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-600 transition-all';
+        }
+      });
+
+      fetchRegistrations();
+    }
+
+    // Search input
+    let searchTimeout = null;
+    function handleSearchInput() {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentSearchTerm = document.getElementById('searchInput').value.trim();
+        fetchRegistrations();
+      }, 300);
+    }
+
+    // Quick Status Update
+    async function quickUpdateStatus(id, newStatus) {
+      try {
+        const res = await fetch(`/api/admin/registrations/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
+        fetchRegistrations();
+      } catch (err) {
+        alert('Erreur : ' + err.message);
+      }
+    }
+
+    // Modal: Open Details & Proof
+    function openDetailModal(id) {
+      const item = allRegistrations.find(r => r.id === id);
+      if (!item) return;
+
+      currentSelectedCandidate = item;
+
+      document.getElementById('modalRegNumber').innerText = item.registration_number;
+      document.getElementById('modalFullName').innerText = item.full_name;
+      document.getElementById('modalGender').innerText = item.gender;
+      document.getElementById('modalPhone').innerText = item.phone;
+      document.getElementById('modalCity').innerText = item.city;
+      document.getElementById('modalCreatedAt').innerText = new Date(item.created_at).toLocaleString('fr-FR');
+      
+      const proofImg = document.getElementById('modalProofImg');
+      proofImg.src = `/uploads/${item.proof_image}`;
+
+      document.getElementById('modalDownloadProofBtn').href = `/api/admin/download-proof/${item.proof_image}`;
+      document.getElementById('modalReceiptLink').href = `/api/registration/${item.registration_number}/receipt`;
+
+      // Status badge in modal
+      const curBadge = document.getElementById('modalCurrentStatus');
+      curBadge.innerText = item.status;
+      if (item.status === 'Validé') curBadge.className = 'px-2 py-0.5 rounded-full font-bold text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/40';
+      else if (item.status === 'Refusé') curBadge.className = 'px-2 py-0.5 rounded-full font-bold text-[10px] bg-red-500/20 text-red-400 border border-red-500/40';
+      else curBadge.className = 'px-2 py-0.5 rounded-full font-bold text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/40';
+
+      document.getElementById('modalAdminNotes').value = item.admin_notes || '';
+
+      // Pre-filled WhatsApp button
+      const cleanPhone = item.phone.replace(/[^0-9]/g, '');
+      const waMsg = encodeURIComponent(`Bonjour ${item.full_name}, l'administration de Intégrateur de Solution vous informe que votre statut d'inscription pour la formation Web Mobile + IA (N° ${item.registration_number}) est : ${item.status}.`);
+      document.getElementById('modalWhatsAppBtn').href = `https://wa.me/${cleanPhone.startsWith('229') ? cleanPhone : '229' + cleanPhone}?text=${waMsg}`;
+
+      document.getElementById('detailModal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeDetailModal() {
+      document.getElementById('detailModal').classList.add('hidden');
+      currentSelectedCandidate = null;
+    }
+
+    async function updateModalStatus(newStatus) {
+      if (!currentSelectedCandidate) return;
+      const notes = document.getElementById('modalAdminNotes').value;
+
+      try {
+        const res = await fetch(`/api/admin/registrations/${currentSelectedCandidate.id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus, adminNotes: notes })
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
+        
+        closeDetailModal();
+        fetchRegistrations();
+      } catch (err) {
+        alert('Erreur: ' + err.message);
+      }
+    }
+
+    async function deleteCurrentModalCandidate() {
+      if (!currentSelectedCandidate) return;
+      if (!confirm(`Êtes-vous sûr de vouloir supprimer l'inscription de ${currentSelectedCandidate.full_name} ? Cette action est irréversible.`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/admin/registrations/${currentSelectedCandidate.id}`, {
+          method: 'DELETE'
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error);
+
+        closeDetailModal();
+        fetchRegistrations();
+      } catch (err) {
+        alert('Erreur: ' + err.message);
+      }
+    }
+
+    // Export to Excel
+    function exportToExcel() {
+      let url = `/api/admin/export/excel?status=${currentFilter}`;
+      if (currentSearchTerm) url += `&search=${encodeURIComponent(currentSearchTerm)}`;
+      window.open(url, '_blank');
+    }
+
+    // Export to PDF
+    function exportToPdf() {
+      let url = `/api/admin/export/pdf?status=${currentFilter}`;
+      if (currentSearchTerm) url += `&search=${encodeURIComponent(currentSearchTerm)}`;
+      window.open(url, '_blank');
+    }
+
+    // Run auth check on init
+    checkAuth();
+  </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion Administration — Formation Intégrateur de Solution</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              dark: '#070B14',
+              blue: '#00D2FF',
+              purple: '#8B5CF6',
+              orange: '#FF7A00'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      background-color: #070B14;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(0, 210, 255, 0.12) 0%, transparent 60%),
+        linear-gradient(to right, rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 text-slate-100">
+
+  <div class="w-full max-w-md">
+    
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-blue to-brand-purple p-0.5 mx-auto mb-4 shadow-xl">
+        <div class="w-full h-full bg-[#0B0F19] rounded-[14px] flex items-center justify-center">
+          <i data-lucide="shield-check" class="w-8 h-8 text-brand-blue"></i>
+        </div>
+      </div>
+      <h1 class="text-2xl font-black uppercase text-white tracking-wider">
+        ESPACE ADMINISTRATEUR
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">
+        Plateforme d'Inscription &bull; Web Mobile + IA
+      </p>
+    </div>
+
+    <!-- Login Card -->
+    <div class="bg-[#0E1628]/90 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+      
+      <!-- Error Alert -->
+      <div id="loginError" class="hidden mb-5 p-3.5 rounded-xl bg-red-500/15 border border-red-500/40 text-red-300 text-xs flex items-center gap-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 shrink-0"></i>
+        <span id="loginErrorMsg">Identifiants incorrects</span>
+      </div>
+
+      <form onsubmit="handleLogin(event)" class="space-y-5">
+        <div>
+          <label for="username" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">
+            Identifiant Administrateur
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+              <i data-lucide="user" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="text" 
+              id="username" 
+              name="username" 
+              required 
+              value="admin"
+              placeholder="Ex : admin"
+              class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-brand-blue transition-colors"
+            >
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase">
+            Mot de passe
+          </label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+              <i data-lucide="lock" class="w-4 h-4"></i>
+            </div>
+            <input 
+              type="password" 
+              id="password" 
+              name="password" 
+              required 
+              value="admin2026"
+              placeholder="••••••••"
+              class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-brand-blue transition-colors"
+            >
+          </div>
+        </div>
+
+        <button 
+          type="submit" 
+          id="loginBtn"
+          class="w-full py-3.5 px-4 bg-brand-blue hover:bg-cyan-400 text-black font-extrabold text-sm uppercase tracking-wider rounded-xl shadow-lg shadow-cyan-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+        >
+          <i data-lucide="log-in" class="w-4 h-4"></i>
+          <span>Se connecter</span>
+        </button>
+      </form>
+
+      <!-- Default credentials helper hint -->
+      <div class="mt-6 pt-5 border-t border-slate-800 text-center">
+        <div class="text-[11px] text-slate-400">
+          Identifiants par défaut configurés :
+        </div>
+        <div class="inline-block mt-1.5 px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-mono text-brand-blue">
+          Utilisateur : <strong>admin</strong> | MDP : <strong>admin2026</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Return to site -->
+    <div class="text-center mt-6">
+      <a href="/" class="text-xs text-slate-400 hover:text-white flex items-center justify-center gap-1.5 transition-colors">
+        <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+        <span>Retourner au site d'inscription</span>
+      </a>
+    </div>
+
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    async function handleLogin(event) {
+      event.preventDefault();
+      const errorDiv = document.getElementById('loginError');
+      const errorMsg = document.getElementById('loginErrorMsg');
+      errorDiv.classList.add('hidden');
+
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || 'Identifiants invalides');
+        }
+
+        // Save token to localStorage as backup
+        localStorage.setItem('admin_token', data.token);
+
+        // Redirect to admin panel
+        window.location.href = '/admin';
+      } catch (err) {
+        errorMsg.innerText = err.message;
+        errorDiv.classList.remove('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
